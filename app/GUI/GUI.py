@@ -123,16 +123,43 @@ class GUI(QMainWindow):
             self.widget.setTitle('Cyclic Voltammetry')
             self.current = np.array(self.data['column_1'])
 
+    def get_models(self, ):
+        # Get classification model
+        if self.CNNnetwork.isChecked():
+            self.clf = 'CNN'
+        elif self.CatBoost.isChecked():
+            self.clf = 'Cat'
+        elif self.Lama.isChecked():
+            self.clf = 'Lama'
+        elif self.Fedot.isChecked():
+            self.clf = 'Fedot'
+        else:
+            self.clf = None
+        # Get regression model
+        if self.CatBoost_2.isChecked():
+            self.reg = 'Cat'
+        elif self.Lama_2.isChecked():
+            self.reg = 'Lama'
+        elif self.Fedot_2.isChecked():
+            self.reg = 'Fedot'
+        else:
+            self.reg = None
+        print(self.clf, self.reg)
+
     def predict_antibiotics(self):
         try:
             # Read data
+            self.get_models()
             df = pd.read_csv(self.fname).T.reset_index() 
             data = np.array(df.iloc[1, :])
             data[0] = float(data[0])
             data = np.array(data, dtype=np.float)
 
             # Make pipeline
-            start_pipeline = Pipeline(data=data)
+            if self.reg is not None and self.clf is not None:
+                start_pipeline = Pipeline(data=data, claffifier_type=self.clf, regression_type=self.reg)
+            else:
+                QMessageBox.warning(self, 'Error', 'Choose models before prediction!')
             antibiotic = start_pipeline.get_classification()
             if antibiotic != 'milk':
                 conc = round(start_pipeline.get_regression(), 3)

@@ -2,6 +2,8 @@ from app.pipeline.src.models import *
 import pickle
 import torch
 from torch.utils.data import TensorDataset
+from catboost import CatBoostClassifier
+
 
 import pandas as pd
 import numpy as np
@@ -9,21 +11,31 @@ import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
+CLASSIFICATION_MODELS_DICT = dict(
+    CNN = ClfModelTabCNN.load_from_checkpoint('app/pipeline/src/epoch=53-step=1350.ckpt', input_dim=5200,output_dim=3),
+    Cat = CatBoostClassifier(),
+    Lama = None,
+    Fedot = None
+)
 
-CLASSIFICATION_MODEL_PATH = 'app/pipeline/src/epoch=53-step=1350.ckpt'
-REGRESSION_MODEL_PATH = 'app/pipeline/src/cat_regression.pkl'
+REGRESSION_MODELS_DICT = dict(
+    Cat = pickle.load(open('app/pipeline/src/cat_regression.pkl', 'rb')),
+    Lama = None, 
+    Fedot = None
+)
+
 LABEL_ENCODER_PATH = 'app/pipeline/src/le.sav'
 
 
 
 
 class Pipeline():
-    def __init__(self, data):
+    def __init__(self, data, claffifier_type='CNN', regression_type='Cat'):
         # self.class_model = ClfModelTabCNN(input_dim=15600,output_dim=3)
-        self.class_model = ClfModelTabCNN.load_from_checkpoint(CLASSIFICATION_MODEL_PATH, input_dim=5200,output_dim=3)
+        self.class_model = CLASSIFICATION_MODELS_DICT[claffifier_type]
         # self.class_model.load_state_dict(torch.load(CLASSIFICATION_MODEL_PATH, map_location='cpu'))
         self.class_model.eval()
-        self.reg_model = pickle.load(open(REGRESSION_MODEL_PATH, 'rb'))
+        self.reg_model = REGRESSION_MODELS_DICT[regression_type]
         self.label_encoder = pickle.load(open(LABEL_ENCODER_PATH, 'rb'))
 
         self.X = data
