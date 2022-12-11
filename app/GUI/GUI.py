@@ -134,8 +134,8 @@ class GUI(QMainWindow):
         # Make pipeline
             start_pipeline = Pipeline(data=data)
             antibiotic = start_pipeline.get_classification()
-            conc = start_pipeline.get_regression()
-            print(antibiotic, conc)
+            conc = round(start_pipeline.get_regression(), 3)
+            # print(antibiotic, conc)
 
             # self.table_data.loc[len(self.table_data.index)] = [self.fname,
             #                                                 antibiotic,
