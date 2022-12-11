@@ -110,7 +110,10 @@
      </font>
     </property>
     <property name="text">
-     <string>Predict antibiotics in milk</string>
+     <string>Predict</string>
+    </property>
+    <property name="autoExclusive">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
@@ -120,7 +123,7 @@
      <x>0</x>
      <y>0</y>
      <width>1273</width>
-     <height>36</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -54,7 +54,7 @@ class GUI(QMainWindow):
             alignment: center;
         }''')
         self.table_data = pd.DataFrame([
-            ], columns=['File name', 'Device', 'Model', 'Binary \n prediction', 'Multi \n prediction'])
+            ], columns=['File name','Substance', 'Antibiotic \n concentration'])
         self.table_data_columns = self.table_data.columns.tolist()
         self.widget.showGrid(x=True, y=True)
         self.current = None
@@ -125,21 +125,23 @@ class GUI(QMainWindow):
 
     def predict_antibiotics(self):
         # try:
-        # Read data
-            print(self.fname)
+            # Read data
             df = pd.read_csv(self.fname).T.reset_index() 
             data = np.array(df.iloc[1, :])
             data[0] = float(data[0])
             data = np.array(data, dtype=np.float)
-        # Make pipeline
+
+            # Make pipeline
             start_pipeline = Pipeline(data=data)
             antibiotic = start_pipeline.get_classification()
-            conc = round(start_pipeline.get_regression(), 3)
-            # print(antibiotic, conc)
+            if antibiotic != 'milk':
+                conc = round(start_pipeline.get_regression(), 3)
+            else:
+                conc = 0
 
-            # self.table_data.loc[len(self.table_data.index)] = [self.fname,
-            #                                                 antibiotic,
-            #                                                 conc]
+            self.table_data.loc[len(self.table_data.index)] = [self.fname,
+                                                            antibiotic,
+                                                            conc]
             self.tableView.model().layoutChanged.emit()
             self.tableView.resizeColumnsToContents()
             if antibiotic == 'milk':
