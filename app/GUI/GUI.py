@@ -144,13 +144,12 @@ class GUI(QMainWindow):
             self.reg = 'Fedot'
         else:
             self.reg = None
-        print(self.clf, self.reg)
 
     def predict_antibiotics(self):
-        try:
-            # Read data
-            self.get_models()
-            df = pd.read_csv(self.fname).T.reset_index() 
+        # Read data
+        self.get_models()
+        df = pd.read_csv(self.fname).T.reset_index() 
+        if df.shape == (2, 15600):
             data = np.array(df.iloc[1, :])
             data[0] = float(data[0])
             data = np.array(data, dtype=np.float)
@@ -158,24 +157,24 @@ class GUI(QMainWindow):
             # Make pipeline
             if self.reg is not None and self.clf is not None:
                 start_pipeline = Pipeline(data=data, claffifier_type=self.clf, regression_type=self.reg)
-            else:
-                QMessageBox.warning(self, 'Error', 'Choose models before prediction!')
-            antibiotic = start_pipeline.get_classification()
-            if antibiotic != 'milk':
-                conc = round(start_pipeline.get_regression(), 3)
-            else:
-                conc = 0
+                antibiotic = start_pipeline.get_classification()
+                if antibiotic != 'milk':
+                    conc = round(start_pipeline.get_regression(), 3)
+                else:
+                    conc = 0
 
-            self.table_data.loc[len(self.table_data.index)] = [self.fname,
-                                                            antibiotic,
-                                                            conc]
-            self.tableView.model().layoutChanged.emit()
-            self.tableView.resizeColumnsToContents()
-            if antibiotic == 'milk':
-                QMessageBox.about(self, 'Prediction', 'Predicted pure milk')
+                self.table_data.loc[len(self.table_data.index)] = [self.fname,
+                                                                antibiotic,
+                                                                conc]
+                self.tableView.model().layoutChanged.emit()
+                self.tableView.resizeColumnsToContents()
+                if antibiotic == 'milk':
+                    QMessageBox.about(self, 'Prediction', 'Predicted pure milk')
+                else:
+                    QMessageBox.about(self, 'Prediction', f'Predicted {antibiotic} \n concentration {conc} mg/l')
             else:
-                QMessageBox.about(self, 'Prediction', f'Predicted {antibiotic} \n concentration {conc} mg/l')
-        except Exception as e:
+                QMessageBox.warning(self, 'Warning', 'Choose models before prediction!')
+        else:
             QMessageBox.warning(self, 'Error', 'Data has wrong length')
 
 
