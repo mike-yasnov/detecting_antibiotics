@@ -116,7 +116,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QTabWidget" name="tabWidget">
+   <widget class="QTabWidget" name="ChooseModel">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -126,7 +126,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="Classification">
      <attribute name="title">
