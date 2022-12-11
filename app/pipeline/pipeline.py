@@ -10,9 +10,9 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-CLASSIFICATION_MODEL_PATH = '/home/mikeyasnov/detecting_antibiotics/Pipeline/src/galacticum_cnn_milk_v1.pth'
-REGRESSION_MODEL_PATH = '/home/mikeyasnov/detecting_antibiotics/Pipeline/src/cat_regression.pkl'
-LABEL_ENCODER_PATH = '/home/mikeyasnov/detecting_antibiotics/Pipeline/src/le.sav'
+CLASSIFICATION_MODEL_PATH = 'app/pipeline/src/galacticum_cnn_milk_v1.pth'
+REGRESSION_MODEL_PATH = 'app/pipeline/src/cat_regression.pkl'
+LABEL_ENCODER_PATH = 'app/pipeline/src/le.sav'
 
 
 
