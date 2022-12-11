@@ -124,7 +124,7 @@ class GUI(QMainWindow):
             self.current = np.array(self.data['column_1'])
 
     def predict_antibiotics(self):
-        # try:
+        try:
             # Read data
             df = pd.read_csv(self.fname).T.reset_index() 
             data = np.array(df.iloc[1, :])
@@ -148,8 +148,8 @@ class GUI(QMainWindow):
                 QMessageBox.about(self, 'Prediction', 'Predicted pure milk')
             else:
                 QMessageBox.about(self, 'Prediction', f'Predicted {antibiotic} \n concentration {conc} mg/l')
-        # except Exception as e:
-        #     QMessageBox.warning(self, 'Error', 'Data has wrong length')
+        except Exception as e:
+            QMessageBox.warning(self, 'Error', 'Data has wrong length')
 
 
 def main():
