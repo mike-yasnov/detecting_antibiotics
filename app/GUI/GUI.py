@@ -54,7 +54,7 @@ class GUI(QMainWindow):
             alignment: center;
         }''')
         self.table_data = pd.DataFrame([
-            ], columns=['File name','Substance', 'Antibiotic \n concentration'])
+            ], columns=['File name','Substance', 'Antibiotic concentration'])
         self.table_data_columns = self.table_data.columns.tolist()
         self.widget.showGrid(x=True, y=True)
         self.current = None
