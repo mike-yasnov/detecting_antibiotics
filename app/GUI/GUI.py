@@ -10,7 +10,8 @@ from app.paths.paths import *
 from app.data.galacticum import Galacticum
 from app.plots.plots import Plot_Graph
 from app.plots.utils import color_pen
-from app.model.pipeline_init import Pipeline_init
+from app.pipeline.pipeline import Pipeline
+
 pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', 'k')
 
@@ -123,24 +124,30 @@ class GUI(QMainWindow):
             self.current = np.array(self.data['column_1'])
 
     def predict_antibiotics(self):
-        try:
-            # TODO 
-            ### Here need to put API for regression
-            start_pipeline = Pipeline_init(PATH_TO_PIPELINE)
-            file_name = self.file_name
-            antibiotic = start_pipeline.predicted_class
-            conc = start_pipeline.predicted_conc
-            self.table_data.loc[len(self.table_data.index)] = [file_name,
-                                                            antibiotic,
-                                                            conc]
+        # try:
+        # Read data
+            print(self.fname)
+            df = pd.read_csv(self.fname).T.reset_index() 
+            data = np.array(df.iloc[1, :])
+            data[0] = float(data[0])
+            data = np.array(data, dtype=np.float)
+        # Make pipeline
+            start_pipeline = Pipeline(data=data)
+            antibiotic = start_pipeline.get_classification()
+            conc = start_pipeline.get_regression()
+            print(antibiotic, conc)
+
+            # self.table_data.loc[len(self.table_data.index)] = [self.fname,
+            #                                                 antibiotic,
+            #                                                 conc]
             self.tableView.model().layoutChanged.emit()
             self.tableView.resizeColumnsToContents()
             if antibiotic == 'milk':
                 QMessageBox.about(self, 'Prediction', 'Predicted pure milk')
             else:
                 QMessageBox.about(self, 'Prediction', f'Predicted {antibiotic} \n concentration {conc} mg/l')
-        except Exception as e:
-            QMessageBox.warning(self, 'Error', 'Data has wrong length')
+        # except Exception as e:
+        #     QMessageBox.warning(self, 'Error', 'Data has wrong length')
 
 
 def main():
