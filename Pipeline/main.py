@@ -28,7 +28,7 @@ class Pipeline():
         self.X = data
 
     def get_classification(self, ):
-        X = torch.tensor(self.X, dtype=torch.float).reshape(1, 15600)
+        X = torch.tensor(self.X, dtype=torch.float).reshape(1, 1040)
         logits = self.class_model(X)
         prediction = logits.argmax(1).numpy()
 

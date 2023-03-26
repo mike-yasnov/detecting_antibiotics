@@ -98,7 +98,7 @@ class GUI(QMainWindow):
             self.display_graph()
             self.predict_antibiotic.setEnabled(True)
         except Exception as e:
-            QMessageBox.warning(self, 'Error', 'Please, select file from galacticum')
+            QMessageBox.warning(self, 'Error', 'Please, select file from ivium')
 
     def display_graph(self):
         self.widget.clear()
@@ -106,7 +106,7 @@ class GUI(QMainWindow):
             a = 1
             self.widget.addLegend()
             for cycle in self.data:
-                self.widget.plot(np.array(self.data[0]['column_0']), np.array(cycle['column_1']),
+                self.widget.plot(np.array(self.data[0][self.data.columns[0]]), np.array(cycle[self.data.columns[1]]),
                                  name=('cycle ' + str(a)), pen=color_pen[int(a)])
                 a = str(int(a)+1)
 
@@ -114,14 +114,14 @@ class GUI(QMainWindow):
             self.widget.setLabel('right', 'Current', units='A')
             self.widget.setLabel('bottom', 'Voltage', units='V')
             self.widget.setTitle('Cyclic Voltammetry')
-            self.current = np.array(self.data[-1]['column_1'])
+            self.current = np.array(self.data[-1][self.data.columns[1]])
         else:
-            self.widget.plot(np.array(self.data['column_0']), np.array(self.data['column_1']), pen='b')
+            self.widget.plot(np.array(self.data[self.data.columns[0]]), np.array(self.data[self.data.columns[1]]), pen='b')
             self.widget.setLabel('left', 'Current', units='A')
             self.widget.setLabel('right', 'Current', units='A')
             self.widget.setLabel('bottom', 'Voltage', units='V')
             self.widget.setTitle('Cyclic Voltammetry')
-            self.current = np.array(self.data['column_1'])
+            self.current = np.array(self.data[self.data.columns[1]])
 
     def get_models(self, ):
         # Get classification model
@@ -131,8 +131,6 @@ class GUI(QMainWindow):
             self.clf = 'Cat'
         elif self.Lama.isChecked():
             self.clf = 'Lama'
-        elif self.Fedot.isChecked():
-            self.clf = 'Fedot'
         else:
             self.clf = None
         # Get regression model
@@ -148,18 +146,15 @@ class GUI(QMainWindow):
     def predict_antibiotics(self):
         # Read data
         self.get_models()
-        df = pd.read_csv(self.fname).T.reset_index() 
-        if df.shape == (2, 15600):
-            data = np.array(df.iloc[1, :])
-            data[0] = float(data[0])
-            data = np.array(data, dtype=np.float)
+        df = np.array(pd.read_csv(self.fname, index_col=0).T.iloc[1])
+        if df.shape == (1040,):
 
             # Make pipeline
             if self.reg is not None and self.clf is not None:
-                start_pipeline = Pipeline(data=data, claffifier_type=self.clf, regression_type=self.reg)
+                start_pipeline = Pipeline(data=df, claffifier_type=self.clf, regressor_type=self.reg)
                 antibiotic = start_pipeline.get_classification()
                 if antibiotic != 'milk':
-                    conc = round(start_pipeline.get_regression(), 3)
+                    conc = abs(round(start_pipeline.get_regression()[0], 10))
                 else:
                     conc = 0
 

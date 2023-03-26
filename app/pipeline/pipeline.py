@@ -12,8 +12,8 @@ import warnings
 warnings.filterwarnings('ignore')
 
 CLASSIFICATION_MODELS_DICT = dict(
-    CNN = ClfModelTabCNN.load_from_checkpoint('app/pipeline/src/epoch=53-step=1350.ckpt', input_dim=5200,output_dim=3),
-    Cat = CatBoostClassifier(),
+    CNN = ClfModelTabCNN.load_from_checkpoint('app/pipeline/src/cnn_ivium.ckpt', input_dim=1040,output_dim=6),
+    Cat = pickle.load(open('app/pipeline/src/cat_ivium.pkl', 'rb')),
     Lama = None,
     Fedot = None
 )
@@ -21,7 +21,7 @@ CLASSIFICATION_MODELS_DICT = dict(
 REGRESSION_MODELS_DICT = dict(
     Cat = pickle.load(open('app/pipeline/src/cat_regression.pkl', 'rb')),
     Lama = None, 
-    Fedot = None
+    Fedot = pickle.load(open('app/pipeline/src/linreg.pkl', 'rb'))
 )
 
 LABEL_ENCODER_PATH = 'app/pipeline/src/le.sav'
@@ -42,7 +42,6 @@ class Pipeline():
         self.reg_model_name = regressor_type
 
         self.class_model = CLASSIFICATION_MODELS_DICT[claffifier_type]
-        self.class_model.eval()
 
         self.reg_model = REGRESSION_MODELS_DICT[regressor_type]
         self.label_encoder = pickle.load(open(LABEL_ENCODER_PATH, 'rb'))
@@ -50,20 +49,22 @@ class Pipeline():
         self.X = data
 
     def get_classification(self, ):
-        X = self.X[-5200:]
         if self.class_model_name == 'CNN':
-            X = torch.tensor(X, dtype=torch.float).reshape(1, 5200)
+            self.class_model.eval()
+            X = torch.tensor(self.X, dtype=torch.float).reshape(1, -1)
             logits = self.class_model(X)
             prediction = logits.argmax(1).numpy()
+
         elif self.class_model_name in ['Cat', 'Lama', 'Fedot']:
-            prediction = self.class_model.predict()
+            prediction = self.class_model.predict(self.X.reshape(1, -1))
         else:
             raise Exception('No pretrained model for this type. Please check the name')
         decoded_prediction = self.label_encoder.inverse_transform(prediction)[0]
         return decoded_prediction
 
     def get_regression(self, ):
-        return self.reg_model.predict(self.X)
+        X = self.X.reshape(1, -1)
+        return self.reg_model.predict(X)
 
     def get_predicted_data(self, ):
         data = {f'feature_{i}': x for (i, x) in enumerate(self.X)}

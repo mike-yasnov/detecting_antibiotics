@@ -9,10 +9,11 @@ class Galacticum:
 
 
     def _read_data(self):
-        data = pd.read_csv(self.fname, header=None, prefix='column_')
+        data = pd.read_csv(self.fname, index_col=0)
         voltage = data[data.columns[0]].values
         current = data[data.columns[1]].values
-        if len(voltage) != 15600:
+        
+        if len(voltage) != 1040:
             return None, None, None
         else:
             return data, voltage, current

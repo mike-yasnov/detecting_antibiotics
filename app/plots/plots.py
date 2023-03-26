@@ -22,7 +22,7 @@ class Plot_Graph:
 
     def plot_one_cycle(self):
         fig = plt.figure()
-        plt.plot(self.data['column_0'], self.data['column_1'])
+        plt.plot(self.data[self.data.columns[0]], self.data[self.data.columns[1]])
         plt.xlabel('Voltage, V')
         plt.ylabel('Current, uA')
         plt.title('Cyclic voltamperometry')
@@ -32,7 +32,7 @@ class Plot_Graph:
         fig = plt.figure()
         number = '1'
         for cycle in self.data:
-            plt.plot(self.data[0]['column_0'], cycle['column_1'], label=(self.name + number))
+            plt.plot(self.data[0][self.data.columns[0]], cycle[self.data.columns[1]], label=(self.name + number))
             number = str(int(number) + 1)
         plt.xlabel('Voltage, V')
         plt.ylabel('Current, uA')
